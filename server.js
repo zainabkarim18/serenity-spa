@@ -15,6 +15,7 @@ const testJWTRouter = require('./controllers/test-jwt');
 const usersRouter = require('./controllers/users');
 const profilesRouter = require('./controllers/profiles');
 const servicesRouter = require('./controllers/services');
+const bookingsRouter = require('./controllers/bookings');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +29,7 @@ app.use('/test-jwt', testJWTRouter);
 app.use('/users', usersRouter);
 app.use('/profiles', verifyToken, profilesRouter);
 app.use('/services', servicesRouter);
+app.use('/bookings', bookingsRouter);
 
 
 app.listen(PORT, () => {
