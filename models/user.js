@@ -20,4 +20,10 @@ const userSchema = new mongoose.Schema({
   bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
 });
 
+userSchema.set('toJSON', {
+  transform: (doc, obj) => {
+    delete obj.hashedPassword;
+  },
+});
+
 module.exports = mongoose.model("User", userSchema);
