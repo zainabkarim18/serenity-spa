@@ -3,6 +3,7 @@ const verifyToken = require('../middleware/verify-token.js');
 const express = require('express');
 const router = express.Router();
 
+router.use(verifyToken);
 
 // CREATE
 router.post('/:userId/:serviceId', async (req, res) => {
@@ -35,29 +36,27 @@ router.post('/:userId/:serviceId', async (req, res) => {
     }
 });
 
-
-// READ - INDEX
+// all booking of a user
 router.get('/', async (req, res) => {
     try {
         const foundBookings = await Booking.find().populate('user').populate('service');
-        
         res.status(200).json(foundBookings);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// DETAIL
-router.get('/:userId', async (req, res) => {
+// details by booking id
+router.get('/:id', async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const foundBooking = await Booking.find({ user: userId }).populate('user').populate('service');
+        const bookingId = req.params.id;
+        const booking = await Booking.findById(bookingId).populate('user').populate('service');
 
-        if (foundBooking.length === 0) {
-            return res.status(404).json({ message: 'No bookings found for this user'});
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
         }
 
-        res.status(200).json(foundBooking);
+        res.status(200).json(booking);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
