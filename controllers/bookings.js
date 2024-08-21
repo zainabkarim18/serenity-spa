@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user.js')
 
+router.use(verifyToken);
 
 // CREATE
 router.post('/:userId/:serviceId', async (req, res) => {
@@ -50,6 +51,23 @@ router.get('/', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+// details by booking id
+router.get('/:id', async (req, res) => {
+    try {
+        const bookingId = req.params.id;
+        const booking = await Booking.findById(bookingId).populate('user').populate('service');
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        res.status(200).json(booking);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 // DETAIL
 router.get('/:userId', async (req, res) => {
