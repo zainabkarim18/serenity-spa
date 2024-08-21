@@ -17,6 +17,10 @@ const serviceSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  image: {
+    type: String,
+    required: false,
+  },
   reviews: [{ 
     type: mongoose.Schema.Types.ObjectId,
     ref: "Review"

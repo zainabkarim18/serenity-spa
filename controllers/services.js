@@ -5,14 +5,14 @@ const router = express.Router();
 
 
 // CREATE
-router.post('/', async (req, res) => {
-    try {
-        const addService = await Service.create(req.body);
-        res.status(201).json(addService);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+    router.post('/', async (req, res) => {
+        try {
+            const addService = await Service.create(req.body);
+            res.status(201).json(addService);
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
 
 // READ - INDEX
 router.get('/', async (req, res) => {
@@ -64,15 +64,17 @@ router.delete('/:id', async (req, res) => {
 
 
 // UPDATE
-router.put('/:id', async (req, res) => {
+router.put('/', async (req, res) => {
     try {
-        const updatedService = await Service.findByIdAndUpdate(req.params.id, req.body, {
+        const updatedService = await Service.findByIdAndUpdate(req.body._id, req.body, {
             new: true,
         });
         if (!updatedService) {
             res.status(404);
             throw new Error('Service not found.');
         }
+        console.log("updated");
+        
         res.status(200).json(updatedService);
     } catch (err) {
         if (res.statusCode === 404) {
