@@ -7,8 +7,7 @@ const User = require('../models/user');
 
 const router = express.Router();
 
-
-//sign up
+// Sign Up
 router.post('/signup', async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
@@ -39,8 +38,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-
-//signin
+// Sign In
 router.post('/signin', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -70,6 +68,44 @@ router.post('/signin', async (req, res) => {
     return res.status(200).json({ user: existingUser, token });
   } catch (error) {
     res.status(400).json({ error: 'Something went wrong, try again.' });
+  }
+});
+
+// Update Profile
+router.put('/update', async (req, res) => {
+  try {
+    const { username, email } = req.body;
+    const userId = req.user.id; // Extract user ID from token (ensure `req.user` is set by middleware)
+
+    if (!username || !email) {
+      return res.status(400).json({ error: 'Username and email are required' });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { username, email },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Create a new token with updated user information
+    const token = jwt.sign(
+      {
+        id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      },
+      process.env.JWT_SECRET
+    );
+
+    res.status(200).json({ user: updatedUser, token });
+  } catch (error) {
+    console.error('Update failed:', error);
+    res.status(400).json({ error: 'Failed to update profile. Please try again.' });
   }
 });
 
