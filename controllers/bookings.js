@@ -11,9 +11,12 @@ router.post('/:userId/:serviceId', async (req, res) => {
     try {
         const userId = req.params.userId;
         const serviceId = req.params.serviceId;
+        console.log(userId);
+        console.log(serviceId);
+        
         const { date, time, status = 'Pending' } = req.body;
 
-        let booking = await Booking.findOne({ user: userId, service: serviceId }).populate('user').populate('service');;
+        let booking = await Booking.findOne({ user: userId, service: serviceId }).populate('user').populate('service');
 
         const obj = {
             user: userId,
@@ -21,19 +24,27 @@ router.post('/:userId/:serviceId', async (req, res) => {
             date,
             time,
             status
-        }
+        };
 
         if (booking) {
-            booking.Booking = booking;
+            booking.date = date;
+            booking.time = time;
+            booking.status = status;
             await booking.save();
-            const usr = await User.findById(userId)
-            usr.bookings.push(booking.id)
-            usr.save();
-            console.log("user booking:", usr.bookings)
-            res.status(201).json(booking);
+            const usr = await User.findById(userId);
+          
+            if (!usr.bookings.includes(booking.id)) {
+                usr.bookings.push(booking.id);
+                await usr.save();
+            }
+            console.log("user booking:", usr.bookings);
+            res.status(200).json(booking);
         } else {
+       
             const addBooking = await Booking.create(obj);
-            await addBooking.save();
+            const usr = await User.findById(userId);
+            usr.bookings.push(addBooking.id);
+            await usr.save();
             res.status(201).json(addBooking);
         }
     } catch (err) {
@@ -41,11 +52,12 @@ router.post('/:userId/:serviceId', async (req, res) => {
     }
 });
 
+
 // READ - INDEX
 router.get('/', async (req, res) => {
     try {
         const foundBookings = await Booking.find().populate('user').populate('service');
-
+        
         res.status(200).json(foundBookings);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -68,9 +80,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-
 // DETAIL
-router.get('/:userId', async (req, res) => {
+router.get('/user/:userId', async (req, res) => {
     try {
         const userId = req.params.userId;
         const foundBooking = await Booking.find({ user: userId }).populate('user').populate('service');
