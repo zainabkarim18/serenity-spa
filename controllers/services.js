@@ -20,6 +20,7 @@ router.post('/'
 router.get('/', async (req, res) => {
     try {
         const foundServices = await Service.find();
+        console.log(foundServices)
         res.status(200).json(foundServices);
     } catch (err) {
         res.status(500).json({ error: err.message });
