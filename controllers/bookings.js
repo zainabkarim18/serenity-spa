@@ -108,6 +108,12 @@ router.delete('/:id', async (req, res) => {
             res.status(404);
             throw new Error('Booking not found.');
         }
+
+        const user = await User.findOne({ bookings: bookingId });
+        if (user) {
+             user.bookings = user.bookings.filter(id => id.toString() !== bookingId);
+            await user.save();
+        }
         res.status(200).json(deleteBooking);
     } catch (err) {
         if (res.statusCode === 404) {

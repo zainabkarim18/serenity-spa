@@ -1,4 +1,5 @@
 const Service = require('../models/service.js')
+const User = require("../models/user.js");
 const verifyToken = require('../middleware/verify-token.js');
 const isAdmin = require("../middleware/isAdmin.js");
 const express = require('express');
@@ -6,8 +7,7 @@ const router = express.Router();
 
 
 // CREATE
-router.post('/'
-     ,async (req, res) => {
+router.post('/' ,async (req, res) => {
         try {
             const addService = await Service.create(req.body);
             res.status(201).json(addService);
